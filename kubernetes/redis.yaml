@@ -1,0 +1,91 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: fast
+  namespace: production
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+  zone: europe-west1-b
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: production
+  labels:
+    name: redis
+spec:
+  ports:
+    - name: redis-service
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
+  selector:
+    name: redis-service
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-conf
+  namespace: production
+data:
+  redis.conf: |
+    appendonly yes
+    protected-mode no
+    bind 0.0.0.0
+    port 6379
+    dir /var/lib/redis
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: production
+spec:
+  serviceName: redis
+  replicas: 1
+  template:
+    metadata:
+      name: redis
+      labels:
+        app: redis
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: redis
+          image: redis:4.0.1-alpine
+          command:
+            - redis-server
+          args:
+            - /etc/redis/redis.conf
+          resources:
+            requests:
+              cpu: 250m
+            limits:
+              cpu: 500m
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: redis-data
+              mountPath: /var/lib/redis
+            - name: redis-conf
+              mountPath: /etc/redis
+      volumes:
+        - name: redis-conf
+          configMap:
+            name: redis-conf
+            items:
+              - key: redis.conf
+                path: redis.conf
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+        annotations:
+          volume.beta.kubernetes.io/storage-class: fast
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
