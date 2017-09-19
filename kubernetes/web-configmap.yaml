@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+  namespace: production
+data:
+  accounts_subdomain: accounts
+  action_mailer_default_from: "Team Spaces <hello@spaces.is>"
+  action_mailer_host: what.spaces.is
+  action_mailer_port: "443"
+  asset_host: https://cdn.spaces.is
+  aws_region: eu-west-1
+  collab_service_url: "wss://collab.spaces.is"
+  default_subdomain: what
+  editor_seconds_to_jwt_expiry: ""
+  elasticsearch_url: http://elasticsearch:80
+  enable_basic_auth: "true"
+  enable_drift: "true"
+  enable_amplitude: "true"
+  enable_google_analytics: "true"
+  google_analytics_tracking_id: ""
+  log_level: info
+  nested_page_limit: "10"
+  rails_env: production
+  rake_env: production
+  rails_log_to_stdout: "true"
+  rails_serve_static_files: "true"
+  redis_network_timeout: "5"
+  redis_url: redis://redis-service.production:6379
+  gcs_files_bucket: "spaces-files"
+  sentry_public_dsn: ""
+  smtp_address: mailhog.cloud66.local
+  smtp_domain: spaces.is
+  smtp_authentication: plain
+  smtp_enabled: "true"
+  smtp_enable_starttls_auto: "true"
+  smtp_port: "25"
+  smtp_username: "abc123"
+  storage_medium: gcs
+  slack_oauth_client_id: "abc123"
