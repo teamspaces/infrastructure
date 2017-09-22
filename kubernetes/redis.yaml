@@ -1,20 +1,10 @@
-kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
-metadata:
-  name: fast
-  namespace: production
-provisioner: kubernetes.io/gce-pd
-parameters:
-  type: pd-ssd
-  zone: europe-west1-b
----
 apiVersion: v1
 kind: Service
 metadata:
   name: redis-service
   namespace: production
   labels:
-    name: redis
+    name: redis-service
 spec:
   ports:
     - name: redis-service
@@ -42,6 +32,8 @@ kind: StatefulSet
 metadata:
   name: redis
   namespace: production
+  labels:
+    name: redis
 spec:
   serviceName: redis
   replicas: 1
@@ -65,8 +57,9 @@ spec:
             limits:
               cpu: 500m
           ports:
-            - containerPort: 6379
-              name: redis
+            - name: redis
+              containerPort: 6379
+              hostPort: 6379
           volumeMounts:
             - name: redis-data
               mountPath: /var/lib/redis

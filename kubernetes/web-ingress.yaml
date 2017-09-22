@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: dracula-ip-1
+spec:
+  # Default baackend
+  backend:
+    serviceName: web-service
+    servicePort: 3000
+
+  # SSL
+  tls:
+  - hosts:
+    - what.spaces.world
+    secretName: spaces-world-ssl
+
+  # Rules
+  rules:
+  - host: what.spaces.world
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: web-service
+          servicePort: 3000
